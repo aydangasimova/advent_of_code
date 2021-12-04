@@ -55,6 +55,10 @@ def verify_life_sup_rating(input_list):
     and keep only numbers with that bit in that position. If 0 and 1 are equally common,
     keep values with a 0 in the position being considered.
 
+    To find oxygen generator rating, determine the most common value (0 or 1) in the current bit position,
+    and keep only numbers with that bit in that position. If 0 and 1 are equally common,
+    keep values with a 1 in the position being considered.
+
     Keep only numbers selected by the bit criteria for the type of rating value for which you are searching.
     Discard numbers which do not match the bit criteria. If you only have one number left, stop;
     this is the rating value for which you are searching.
@@ -62,35 +66,56 @@ def verify_life_sup_rating(input_list):
 
     :return: life support rating which is a product of oxygen generator rating the CO2 scrubber rating
     """
-    fitting_oxygen_criteria = input_list
-    fitting_co2_criteria = input_list
+    fitting_oxygen_criteria = set(input_list)
+    fitting_co2_criteria = set(input_list)
+
+    oxygen_unfit = set()
+    co2_unfit = set()
 
     for bit_position in range(len(input_list[0])):
+        print(f"BIT POSITION {bit_position} ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        mcv = most_common_value_in_bit_position(bit_position, input_list)
 
         for number in input_list:
-            if most_common_value_in_bit_position(bit_position, input_list) == 1:
-                if len(fitting_oxygen_criteria) != 1:
-                    print(len(fitting_oxygen_criteria), "fitting_oxygen_criteria len is not 1 so check to drop ")
-                    if int(number[bit_position]) == 1:
+            print(f"~~~~~~~~~~~~~~~~~~NUMBER IS {number}")
 
-                        fitting_oxygen_criteria.remove(number)
-                        print("after dropping fitting_oxygen_criteria len is", len(fitting_oxygen_criteria))
+            if mcv == int(number[bit_position]):
+                if len(co2_unfit) != 999:
+                    print(f"MCV is {mcv} SAME AS {number[bit_position]}")
+                    co2_unfit.add(number)
+                    print(f"after  adding {number} len to CO2 unfit len is {len(co2_unfit)}")
 
-            elif most_common_value_in_bit_position(bit_position, input_list) == 0:
-                if len(fitting_co2_criteria) != 1:
-                    if int(number[bit_position]) == 1:
-                       fitting_co2_criteria.remove(number)
-
-            else:
+            elif mcv == 'equal':
                 # If 0 and 1 are equally common, keep values with a 1 in the position being considered.
-                if int(number[0]) == 1:
-                    fitting_co2_criteria.remove(number)
-                else:
-                    fitting_oxygen_criteria.remove(number)
+                print(f'mcv is {mcv} should be equal')
+                if int(number[bit_position]) == 1:
+                    # print(f'number first digit is {int(number[bit_position])}, should be 1 therefore they need to go from CO2')
+                    # print(f"len of CO2 fitting criteria is not yet 1, is {len(fitting_co2_criteria)}")
+                    co2_unfit.add(number)
+                    # print(f"after  removing {number} len of CO2 fitting criteria is {len(fitting_co2_criteria)}")
 
-    oxygen_rating = fitting_oxygen_criteria[0]
-    print(len(fitting_oxygen_criteria), len(fitting_co2_criteria), 'both should be 1')
-    co2_rating = fitting_co2_criteria[0]
+                else:
+                    # print(f'number first digit is {int(number[0])}, should be 0 therefore they need to go from OXYGEN')
+                    # print(f"len of OXYGEN fitting criteria is not yet 1, is {len(fitting_oxygen_criteria)}")
+                    oxygen_unfit.add(number)
+                    # print(f"after  removing {number} len of OXYGEN fitting criteria is {len(fitting_oxygen_criteria)}")
+            else:
+                if len(oxygen_unfit) != 999:
+                    print(f"MCV is {mcv} DIFFERENT FROM {number[bit_position]} in position {bit_position}")
+                    oxygen_unfit.add(number)
+                    print(f"after  adding {number} len to OXYGEN unfit len is {len(oxygen_unfit)}")
+
+
+
+
+    print(len(oxygen_unfit), len(co2_unfit), 'both should be 999')
+
+    print(len(fitting_oxygen_criteria.difference(oxygen_unfit)), len(fitting_co2_criteria.difference(co2_unfit)), 'both should be 1')
+
+    # add a stop once I find both
+    oxygen_rating = next(iter(fitting_oxygen_criteria.difference(oxygen_unfit)))
+    co2_rating = next(iter(fitting_co2_criteria.difference(co2_unfit)))
+    print(oxygen_rating, co2_rating)
 
     return int(co2_rating, 2)*int(oxygen_rating, 2)
 
@@ -100,6 +125,9 @@ if __name__ == '__main__':
     input_list = [line.rstrip() for line in open('input3.csv', 'r')]
     # answer_1 = frequency_of_bits(input_list)
     answer_2 = verify_life_sup_rating(input_list)
+
+    for i in range(len(input_list[0])):
+        print(f" MCV in bit position {i} is {most_common_value_in_bit_position(i, input_list)}")
 
     # print('Answer 1: ', answer_1)
     print('Answer 2: ', answer_2)
