@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple
 
+
 def calculate_win_score(board_rows: List[List[int]], called_numbers, winning_number) -> int:
 
     all_board_numbers = [number for row in board_rows for number in row]
@@ -71,7 +72,6 @@ if __name__ == '__main__':
     winner = False
 
     for number in numbers_to_call:
-        print(f"Calling Number, {number}")
         called_numbers.append(number)
         if winner is False:
             for board in all_boards.items():
@@ -79,7 +79,7 @@ if __name__ == '__main__':
                     winner = True
                     winning_board = board
                     winning_number = number
-                    print("we have a winner", winning_board)
+                    # print("we have a winner", winning_board)
                     break
         else:
             break
@@ -88,5 +88,29 @@ if __name__ == '__main__':
                                    called_numbers=called_numbers,
                                    winning_number=winning_number)
 
+    # figure out which board will win last
+    called_numbers = []
+
+    winners_in_order = {}
+    winning_boards_with_number = {}
+    winning_boards = []
+
+    for index, number in enumerate(numbers_to_call):
+        called_numbers.append(number)
+
+        for board in all_boards.items():
+            if board not in winning_boards:
+                if check_for_full_row(board, called_numbers) != check_for_full_col(board, called_numbers):
+                    winning_boards.append(board)
+                    winners_in_order[index] = (number, board[0])
+
+    last_winner = sorted(winners_in_order.items(), reverse=True)[0]
+    last_winner_board = all_boards[last_winner[1][1]]
+    last_winning_number = last_winner[1][0]
+
+    answer_2 = calculate_win_score(board_rows=last_winner_board,
+                                   called_numbers=numbers_to_call[:last_winner[0]+1],
+                                   winning_number=last_winning_number)
+
     print('Answer 1: ', answer_1)
-    # print('Answer 2: ', answer_2)
+    print('Answer 2: ', answer_2)
