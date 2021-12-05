@@ -2,7 +2,6 @@ from typing import List, Dict, Tuple
 
 
 def calculate_win_score(board_rows: List[List[int]], called_numbers, winning_number) -> int:
-
     all_board_numbers = [number for row in board_rows for number in row]
     all_unmarked_numbers = list(set(all_board_numbers) - set(called_numbers))
     score = sum(all_unmarked_numbers)*winning_number
@@ -79,7 +78,6 @@ if __name__ == '__main__':
                     winner = True
                     winning_board = board
                     winning_number = number
-                    # print("we have a winner", winning_board)
                     break
         else:
             break
