@@ -1,5 +1,8 @@
-
 def most_common_value_in_bit_position(bit_position, input_list):
+    """
+    Given an input list of binary numbers of the same length,
+    finds the most common bit for a given position in the number
+    """
     freq_1 = 0
     freq_0 = 0
     for row_ind in range(len(input_list)):
@@ -55,10 +58,6 @@ def verify_life_sup_rating(input_list):
     and keep only numbers with that bit in that position. If 0 and 1 are equally common,
     keep values with a 0 in the position being considered.
 
-    To find oxygen generator rating, determine the most common value (0 or 1) in the current bit position,
-    and keep only numbers with that bit in that position. If 0 and 1 are equally common,
-    keep values with a 1 in the position being considered.
-
     Keep only numbers selected by the bit criteria for the type of rating value for which you are searching.
     Discard numbers which do not match the bit criteria. If you only have one number left, stop;
     this is the rating value for which you are searching.
@@ -78,7 +77,7 @@ def verify_life_sup_rating(input_list):
                 fitting_oxygen_criteria = list(filter(lambda number: int(number[bit_position]) == 1, fitting_oxygen_criteria))
 
         if len(fitting_co2_criteria) != 1:
-            mcv_co2 = most_common_value_in_bit_position(bit_position, input_list)
+            mcv_co2 = most_common_value_in_bit_position(bit_position, fitting_co2_criteria)
             if mcv_co2 != 'equal':
                 fitting_co2_criteria = list(
                     filter(lambda number: int(number[bit_position]) != mcv_co2, fitting_co2_criteria))
@@ -86,23 +85,18 @@ def verify_life_sup_rating(input_list):
                 fitting_co2_criteria = list(
                     filter(lambda number: int(number[bit_position]) == 0, fitting_co2_criteria))
 
-    print(len(fitting_oxygen_criteria), len(fitting_co2_criteria), 'both should be 1')
-
     oxygen_rating = fitting_oxygen_criteria[0]
     co2_rating = fitting_co2_criteria[0]
-    print(oxygen_rating, co2_rating)
 
     return int(co2_rating, 2)*int(oxygen_rating, 2)
 
 
 if __name__ == '__main__':
 
-    input_list = [line.rstrip() for line in open('test.csv', 'r')]
-    for i in range(len(input_list[0])):
-        print(f" MCV in bit position {i} is {most_common_value_in_bit_position(i, input_list)}")
+    input_list = [line.rstrip() for line in open('input3.csv', 'r')]
 
-    # answer_1 = frequency_of_bits(input_list)
+    answer_1 = frequency_of_bits(input_list)
     answer_2 = verify_life_sup_rating(input_list)
 
-    # print('Answer 1: ', answer_1)
+    print('Answer 1: ', answer_1)
     print('Answer 2: ', answer_2)
