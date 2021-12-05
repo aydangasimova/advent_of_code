@@ -1,25 +1,12 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
-import pandas as pd
+def calculate_win_score(board_rows: List[List[int]], called_numbers, winning_number) -> int:
 
+    all_board_numbers = [number for row in board_rows for number in row]
+    all_unmarked_numbers = list(set(all_board_numbers) - set(called_numbers))
+    score = sum(all_unmarked_numbers)*winning_number
 
-class Board:
-    def __init__(self, line_list, board_id):
-        self.board_id = board_id
-        self.board = line_list
-
-    def update_board(self, called_number: int):
-        pass
-
-    def sum_board_column(self) -> int:
-        pass
-
-    def sum_board_row(self) -> int:
-        pass
-
-
-def calculate_win_score(board: pd.DataFrame) -> int:
-    pass
+    return score
 
 
 def get_list_of_numbers_to_call(input_csv: str) -> List:
@@ -31,7 +18,7 @@ def get_list_of_numbers_to_call(input_csv: str) -> List:
 def parse_boards(input_csv: str) -> Dict[int, List[List[int]]]:
     all_boards: Dict = {}
 
-    input = [line.rstrip() for line in open("input4.csv", 'r')][2:]
+    input = [line.rstrip() for line in open(input_csv, 'r')][2:]
     board_id = 0
     all_boards[board_id] = []
 
@@ -40,25 +27,66 @@ def parse_boards(input_csv: str) -> Dict[int, List[List[int]]]:
             board_id += 1
             all_boards[board_id] = []
         else:
-            print(line)
+            # print(line)
             all_boards[board_id].append(list(map(int, line.split())))
 
     return all_boards
 
 
-def call_number(called_number: int, boards: List) -> List:
-    pass
+def check_for_full_row(board, called_numbers) -> bool:
+    for row in board[1]:
+        if all(number in called_numbers for number in row) is True:
+            result = True
+            break
+        else:
+            result = False
+    return result
+
+
+def check_for_full_col(board, called_numbers) -> bool:
+
+    columns = []
+    for col_index in range(len(board[1])):
+        column = []
+        for row in board[1]:
+            column.append(row[col_index])
+        columns.append(column)
+
+    for col in columns:
+        if all(number in called_numbers for number in col) is True:
+            result = True
+            break
+        else:
+            result = False
+
+    return result
 
 
 if __name__ == '__main__':
 
-    # TODO call number until there is a winner, identify winning board and calculate its score
-    called_numbers = get_list_of_numbers_to_call("input4.csv")
-    print(f"The following numbers are called, {called_numbers}")
+    numbers_to_call = get_list_of_numbers_to_call("input4.csv")
+    all_boards = parse_boards("input4.csv")
+    called_numbers = []
+    winning_board: Tuple[int, List[List[int]]]
+    winner = False
 
+    for number in numbers_to_call:
+        print(f"Calling Number, {number}")
+        called_numbers.append(number)
+        if winner is False:
+            for board in all_boards.items():
+                if check_for_full_row(board, called_numbers) or check_for_full_col(board, called_numbers):
+                    winner = True
+                    winning_board = board
+                    winning_number = number
+                    print("we have a winner", winning_board)
+                    break
+        else:
+            break
 
-    # answer_1 = frequency_of_bits(input_list)
-    # answer_2 = verify_life_sup_rating(input_list)
+    answer_1 = calculate_win_score(board_rows=winning_board[1],
+                                   called_numbers=called_numbers,
+                                   winning_number=winning_number)
 
-    # print('Answer 1: ', answer_1)
+    print('Answer 1: ', answer_1)
     # print('Answer 2: ', answer_2)
