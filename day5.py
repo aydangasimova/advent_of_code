@@ -46,16 +46,35 @@ def count_crossed_points(horizontal_lines, vertical_lines, diagonal_lines=None):
 
             y_unsorted = [line[0][1], line[1][1]]
             y_range = sorted(y_unsorted)
+
             print(f"looking at line {line}, with x range of {x_range}")
             print(f"and y range of {y_range}")
 
-            for x_value, y_value in zip(range(x_range[0], x_range[1]+1), range(y_range[0], y_range[1]+1)):
-                point = (x_value, y_value)
-                print(f"point is {point}")
-                if point in point_cross_dict.keys():
-                    point_cross_dict[point] += 1
-                else:
-                    point_cross_dict[point] = 1
+            x_increasing = x_unsorted == x_range
+            y_increasing = y_unsorted == y_range
+
+            if x_increasing == y_increasing:
+                print("SCENARIO 1")
+                # x values are increasing and y values are increasing so the following works
+                for x_value, y_value in zip(range(x_range[0], x_range[1]+1), range(y_range[0], y_range[1]+1)):
+                    point = (x_value, y_value)
+                    print(f"point is {point}")
+                    if point in point_cross_dict.keys():
+                        point_cross_dict[point] += 1
+                    else:
+                        point_cross_dict[point] = 1
+
+            if x_increasing and not y_increasing:
+                print("SCENARIO 2")
+                for x_value, y_order in zip(range(x_range[0], x_range[1]+1), range(len(range(y_range[0], y_range[1]+1)))):
+                    print(f"y order is {y_order}, index of y_range is {0-y_order}")
+                    point = (x_value, range(y_range[0], y_range[1])[0-y_order])
+                    print(f"point is {point}")
+                    if point in point_cross_dict.keys():
+                        point_cross_dict[point] += 1
+                    else:
+                        point_cross_dict[point] = 1
+
 
     return point_cross_dict
 
