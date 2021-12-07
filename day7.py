@@ -18,18 +18,6 @@ def parse_file(input_file: str) -> List[int]:
     return all_initial_timers
 
 
-def find_median_position(positions):
-    n = len(positions)
-    if n % 2 == 0:
-        median = positions[n // 2]
-    else:
-        median1 = positions[n - 1 // 2]
-        median2 = positions[n + 1 // 2]
-        median = (median1 + median2) / 2
-
-    return median
-
-
 def fuel_expenditure(convergence_point, start_positions):
     fuel = sum([abs(start_position - convergence_point) for start_position in start_positions])
     return fuel
@@ -56,11 +44,9 @@ def find_convergence_point(positions, convergence_point):
     else:
         if convergence_fuel > exp_fuel_expenditure(convergence_point - 1, positions):
             convergence_point -= 1
-            # print(f"CP is more to the LEFT, updated to {convergence_point}")
 
         else:
             convergence_point += 1
-            # print(f"CP is more to the RIGHT, updated to {convergence_point}")
 
         return find_convergence_point(positions, convergence_point)
 
