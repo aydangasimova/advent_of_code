@@ -13,30 +13,31 @@ def parse_file(input_file):
     return line_tuple_list
 
 
+def count_point_in_dict(point, point_cross_dict):
+    if point in point_cross_dict.keys():
+        point_cross_dict[point] += 1
+    else:
+        point_cross_dict[point] = 1
+
+
 def count_crossed_points(horizontal_lines, vertical_lines, diagonal_lines=None):
     point_cross_dict = {}
 
     for line in horizontal_lines:
         y_value = line[0][1]
-        x_range = sorted([line[0][0], line[1][0]])
+        sorted_x_ends = sorted([line[0][0], line[1][0]])
 
-        for x_value in range(x_range[0], x_range[1] + 1):
+        for x_value in range(sorted_x_ends[0], sorted_x_ends[1] + 1):
             point = (x_value, y_value)
-            if point in point_cross_dict.keys():
-                point_cross_dict[point] += 1
-            else:
-                point_cross_dict[point] = 1
+            count_point_in_dict(point, point_cross_dict)
 
     for line in vertical_lines:
         x_value = line[0][0]
-        y_range = sorted([line[0][1], line[1][1]])
+        sorted_y_ends = sorted([line[0][1], line[1][1]])
 
-        for y_value in range(y_range[0], y_range[1] + 1):
+        for y_value in range(sorted_y_ends[0], sorted_y_ends[1] + 1):
             point = (x_value, y_value)
-            if point in point_cross_dict.keys():
-                point_cross_dict[point] += 1
-            else:
-                point_cross_dict[point] = 1
+            count_point_in_dict(point, point_cross_dict)
 
     if diagonal_lines:
         for i, line in enumerate(diagonal_lines):
@@ -61,10 +62,7 @@ def count_crossed_points(horizontal_lines, vertical_lines, diagonal_lines=None):
                 else:
                     point = (x, y)
 
-                if point in point_cross_dict.keys():
-                    point_cross_dict[point] += 1
-                else:
-                    point_cross_dict[point] = 1
+                count_point_in_dict(point, point_cross_dict)
 
     return point_cross_dict
 
