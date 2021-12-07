@@ -14,14 +14,13 @@ def parse_file(input_file):
 
 
 def count_crossed_points(horizontal_lines, vertical_lines, diagonal_lines=None):
-
     point_cross_dict = {}
 
     for line in horizontal_lines:
         y_value = line[0][1]
         x_range = sorted([line[0][0], line[1][0]])
 
-        for x_value in range(x_range[0], x_range[1]+1):
+        for x_value in range(x_range[0], x_range[1] + 1):
             point = (x_value, y_value)
             if point in point_cross_dict.keys():
                 point_cross_dict[point] += 1
@@ -41,40 +40,31 @@ def count_crossed_points(horizontal_lines, vertical_lines, diagonal_lines=None):
 
     if diagonal_lines:
         for i, line in enumerate(diagonal_lines):
-            x_unsorted =[line[0][0], line[1][0]]
-            x_range = sorted(x_unsorted)
+            x_ends = [line[0][0], line[1][0]]
+            y_ends = [line[0][1], line[1][1]]
+            sorted_x_ends = sorted(x_ends)
+            sorted_y_ends = sorted(y_ends)
 
-            y_unsorted = [line[0][1], line[1][1]]
-            y_range = sorted(y_unsorted)
+            x_values = []
+            y_values = []
 
-            print(f"looking at line {line}, with x range of {x_range}")
-            print(f"and y range of {y_range}")
+            for x, y in zip(range(sorted_x_ends[0], sorted_x_ends[1]+1), range(sorted_y_ends[0], sorted_y_ends[1]+1)):
+                x_values.append(x)
+                y_values.append(y)
 
-            x_increasing = x_unsorted == x_range
-            y_increasing = y_unsorted == y_range
+            for i, (x, y) in enumerate(zip(x_values, y_values)):
 
-            if x_increasing == y_increasing:
-                print("SCENARIO 1")
-                # x values are increasing and y values are increasing so the following works
-                for x_value, y_value in zip(range(x_range[0], x_range[1]+1), range(y_range[0], y_range[1]+1)):
-                    point = (x_value, y_value)
-                    print(f"point is {point}")
-                    if point in point_cross_dict.keys():
-                        point_cross_dict[point] += 1
-                    else:
-                        point_cross_dict[point] = 1
+                if x_ends == sorted_x_ends and y_ends != sorted_y_ends:
+                    point = (x, sorted(y_values, reverse=True)[i])
+                elif x_ends != sorted_x_ends and y_ends == sorted_y_ends:
+                    point = (sorted(x_values, reverse=True)[i], y)
+                else:
+                    point = (x, y)
 
-            if x_increasing and not y_increasing:
-                print("SCENARIO 2")
-                for x_value, y_order in zip(range(x_range[0], x_range[1]+1), range(len(range(y_range[0], y_range[1]+1)))):
-                    print(f"y order is {y_order}, index of y_range is {0-y_order}")
-                    point = (x_value, range(y_range[0], y_range[1])[0-y_order])
-                    print(f"point is {point}")
-                    if point in point_cross_dict.keys():
-                        point_cross_dict[point] += 1
-                    else:
-                        point_cross_dict[point] = 1
-
+                if point in point_cross_dict.keys():
+                    point_cross_dict[point] += 1
+                else:
+                    point_cross_dict[point] = 1
 
     return point_cross_dict
 
@@ -89,7 +79,7 @@ def count_overlap_points(point_cross_dict):
 
 if __name__ == '__main__':
 
-    line_tuple_list = parse_file('test.csv')
+    line_tuple_list = parse_file('input5.csv')
     horizontal_lines = []
     vertical_lines = []
 
@@ -109,8 +99,6 @@ if __name__ == '__main__':
 
     point_cross_dict2 = count_crossed_points(horizontal_lines, vertical_lines, diagonal_lines)
     answer_2 = count_overlap_points(point_cross_dict2)
-
-    print(diagonal_lines)
 
     print('Answer 1: ', answer_1)
     print('Answer 2: ', answer_2)
