@@ -1,5 +1,5 @@
 import csv
-from typing import List
+from typing import List, Dict
 
 
 def parse_file(input_file: str) -> List[int]:
@@ -18,7 +18,7 @@ def parse_file(input_file: str) -> List[int]:
 
 
 class Fish:
-    def __init__(self, initial_timer, school: List, spawn_rate=6):
+    def __init__(self, initial_timer, school, spawn_rate=6):
         self.initial_timer = initial_timer
         self.spawn_rate = spawn_rate
         self.current_timer = initial_timer
@@ -42,26 +42,46 @@ class School:
     def __init__(self, all_initial_timers, spawn_rate=6, newborn_spawn_rate=9):
         self.all_initial_timers = all_initial_timers
         self.spawn_rate = spawn_rate
-        self.current_timers = all_initial_timers
-        self.school_size = len(all_initial_timers)
+        self.school_size_by_day: Dict[int, int] = {0: len(all_initial_timers)}
         self.newborn_spawn_rate = newborn_spawn_rate
 
-    def make_fish_babies(self, newborn_spawn_rate=9):
-        baby_fishies = Fish(newborn_spawn_rate)
-        self.current_timers.append(baby_fishies)
+        self.current_timers: Dict[int, int] = {}
+        for timer in self.all_initial_timers:
+            if timer in self.current_timers.keys():
+                self.current_timers[timer] += 1
+            else:
+                self.current_timers[timer] = 1
 
-    def update_timers(self):
+    def update_timers(self, day):
         # reset timer to count down again and make a new fish with internal_timer range(0, 9)
         # next day new fish starts counting down too
+        count_new_babies = 0
+        if 0 in self.current_timers.keys():
+            count_new_babies = self.current_timers[0]
+            if count_new_babies > 0:
+                self.current_timers[self.newborn_spawn_rate] += count_new_babies
 
-        reset_fishies = list(filter(lambda timer: timer != 0, self.current_timers))
-        count_new_babies = self.school_size - len(reset_fishies)
-        self.current_timers = [reset_fish_timer - 1 for reset_fish_timer in reset_fishies]
+        for timer in range(1, self.newborn_spawn_rate):
+            if timer in self.current_timers.keys():
+                self.current_timers[timer] = self.current_timers[timer] - 1
+            if self.spawn_rate in self.current_timers.keys():
+                self.current_timers[self.spawn_rate] += count_new_babies
+            else:
+                self.current_timers[self.spawn_rate] = count_new_babies
 
-        if count_new_babies > 0:
-            self.current_timers += [self.newborn_spawn_rate]*count_new_babies
+        self.school_size_by_day[day] = self.school_size_by_day[day-1] + count_new_babies
 
-        self.school_size += count_new_babies
+
+def simulate_faster(all_initial_timers: List, days_to_run: int = 256):
+
+    school = School(all_initial_timers)
+    days_past = 0
+
+    while days_to_run - days_past > 0:
+        days_past += 1
+        school.update_timers(days_past)
+
+    return school.school_size_by_day[255]
 
 
 def simulate(all_initial_timers: List, days_to_run: int = 80):
@@ -77,16 +97,6 @@ def simulate(all_initial_timers: List, days_to_run: int = 80):
             fish.update_timer()
 
     return len(school)
-
-
-def simulate_faster(all_initial_timers: List, days_to_run: int = 256):
-    school = School(all_initial_timers, days_to_run)
-    days_past = 0
-    while days_to_run - days_past > 0:
-        days_past += 1
-        school.update_timers()
-
-    return school.school_size
 
 
 if __name__ == '__main__':
