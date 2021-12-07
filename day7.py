@@ -1,9 +1,6 @@
 import csv
 import numpy as np
 from typing import List
-import sys
-
-sys.setrecursionlimit(10**6)
 
 
 def parse_file(input_file: str) -> List[int]:
@@ -49,40 +46,35 @@ def exp_fuel_expenditure(convergence_point, start_positions):
     return total_fuel
 
 
-def find_convergence_point(positions, current_median):
-    current_median_fuel = exp_fuel_expenditure(current_median, positions)
+def find_convergence_point(positions, convergence_point):
+    convergence_fuel = exp_fuel_expenditure(convergence_point, positions)
 
-    if (current_median_fuel <= exp_fuel_expenditure(median - 1, positions) and
-            (current_median_fuel <= exp_fuel_expenditure(median+1, positions))):
-        convergence_point = current_median
-        print("convergence is at ", convergence_point)
+    if (convergence_fuel <= exp_fuel_expenditure(convergence_point - 1, positions) and
+            (convergence_fuel <= exp_fuel_expenditure(convergence_point + 1, positions))):
         return convergence_point
 
     else:
-        if current_median_fuel > exp_fuel_expenditure(median - 1, positions):
-            print("true convergence point is to the left")
-            subsample = list(filter(lambda pos: [pos < median for pos in positions], positions))
-            subsample_median = np.median(subsample)
+        if convergence_fuel > exp_fuel_expenditure(convergence_point - 1, positions):
+            convergence_point -= 1
+            # print(f"CP is more to the LEFT, updated to {convergence_point}")
+
         else:
-            print("true convergence point is to the right")
-            subsample = list(filter(lambda pos: [pos > median for pos in positions], positions))
-            subsample_median = np.median(subsample)
+            convergence_point += 1
+            # print(f"CP is more to the RIGHT, updated to {convergence_point}")
 
-        find_convergence_point(subsample, subsample_median)
-
+        return find_convergence_point(positions, convergence_point)
 
 
 if __name__ == '__main__':
-    start_positions = parse_file("test2.csv")
+    start_positions = parse_file("input7.csv")
 
-    sorted_positions = sorted(start_positions)
     median = np.median(start_positions)
     convergence_point = np.median(start_positions)
-    # exp_fuel_expenditure(convergence_point, start_positions)
+
     answer_1 = fuel_expenditure(convergence_point, start_positions)
 
-    # exp_convergence_point = find_convergence_point(start_positions, median)
-    answer_2 = find_convergence_point(start_positions, median)
+    exp_convergence_point = find_convergence_point(start_positions, median)
+    answer_2 = exp_fuel_expenditure(exp_convergence_point, start_positions)
 
     print('Answer 1: ', answer_1)
     print('Answer 2: ', answer_2)
