@@ -52,21 +52,23 @@ class School:
             else:
                 self.current_timers[timer] = 1
 
-    def update_timers(self, day):
-        # reset timer to count down again and make a new fish with internal_timer range(0, 9)
-        # next day new fish starts counting down too
+    def update_timers(self):
         count_new_babies = 0
 
         new_timers = {}
-        for timer in self.current_timers.keys():
+        for timer in sorted(self.current_timers.keys()):
             if timer != 0:
-                new_timers[timer-1] = self.current_timers[timer]
+                if timer-1 in new_timers.keys():
+                    new_timers[timer-1] += self.current_timers[timer]
+                else:
+                    new_timers[timer-1] = self.current_timers[timer]
+
 
             else:
                 count_new_babies = self.current_timers[0]
                 if count_new_babies > 0:
                     new_timers[self.newborn_spawn_rate] = count_new_babies
-                    if self.spawn_rate in new_timers.keys():
+                    if self.spawn_rate in new_timers:
                         new_timers[self.spawn_rate] += count_new_babies
                     else:
                         new_timers[self.spawn_rate] = count_new_babies
@@ -82,8 +84,7 @@ def simulate_faster(all_initial_timers: List, days_to_run: int = 256):
 
     while days_to_run - days_past > 0:
         days_past += 1
-        school.update_timers(days_past)
-        print(f"After {days_past} day: {school.current_timers}")
+        school.update_timers()
 
     return school.school_size
 
@@ -105,13 +106,10 @@ def simulate(all_initial_timers: List, days_to_run: int = 80):
 
 if __name__ == '__main__':
 
-    all_initial_timers = parse_file("test.csv")
+    all_initial_timers = parse_file("input6.csv")
 
-    # answer_1 = simulate(all_initial_timers)
-    answer_2 = simulate_faster(all_initial_timers, days_to_run=18)
+    answer_1 = simulate(all_initial_timers)
+    answer_2 = simulate_faster(all_initial_timers, days_to_run=256)
 
-    # print('Answer 1: ', answer_1)
-
-    # 26984457539 test answer
-    #  my answer
+    print('Answer 1: ', answer_1)
     print('Answer 2: ', answer_2)
