@@ -39,10 +39,10 @@ class Fish:
 
 
 class School:
-    def __init__(self, all_initial_timers, spawn_rate=6, newborn_spawn_rate=9):
+    def __init__(self, all_initial_timers, spawn_rate=6, newborn_spawn_rate=8):
         self.all_initial_timers = all_initial_timers
         self.spawn_rate = spawn_rate
-        self.school_size_by_day: Dict[int, int] = {0: len(all_initial_timers)}
+        self.school_size = len(all_initial_timers)
         self.newborn_spawn_rate = newborn_spawn_rate
 
         self.current_timers: Dict[int, int] = {}
@@ -62,13 +62,17 @@ class School:
             if timer != 0:
                 new_timers[timer-1] = self.current_timers[timer]
 
-            if timer == 0:
+            else:
                 count_new_babies = self.current_timers[0]
                 if count_new_babies > 0:
                     new_timers[self.newborn_spawn_rate] = count_new_babies
-                    new_timers[self.spawn_rate] = count_new_babies
+                    if self.spawn_rate in new_timers.keys():
+                        new_timers[self.spawn_rate] += count_new_babies
+                    else:
+                        new_timers[self.spawn_rate] = count_new_babies
 
-        self.school_size_by_day[day] = self.school_size_by_day[day-1] + count_new_babies
+        self.current_timers = new_timers
+        self.school_size += count_new_babies
 
 
 def simulate_faster(all_initial_timers: List, days_to_run: int = 256):
@@ -79,8 +83,9 @@ def simulate_faster(all_initial_timers: List, days_to_run: int = 256):
     while days_to_run - days_past > 0:
         days_past += 1
         school.update_timers(days_past)
+        print(f"After {days_past} day: {school.current_timers}")
 
-    return school.school_size_by_day[days_to_run]
+    return school.school_size
 
 
 def simulate(all_initial_timers: List, days_to_run: int = 80):
@@ -103,7 +108,7 @@ if __name__ == '__main__':
     all_initial_timers = parse_file("test.csv")
 
     # answer_1 = simulate(all_initial_timers)
-    answer_2 = simulate_faster(all_initial_timers, days_to_run=256)
+    answer_2 = simulate_faster(all_initial_timers, days_to_run=18)
 
     # print('Answer 1: ', answer_1)
 
