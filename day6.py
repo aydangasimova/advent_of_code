@@ -56,18 +56,17 @@ class School:
         # reset timer to count down again and make a new fish with internal_timer range(0, 9)
         # next day new fish starts counting down too
         count_new_babies = 0
-        if 0 in self.current_timers.keys():
-            count_new_babies = self.current_timers[0]
-            if count_new_babies > 0:
-                self.current_timers[self.newborn_spawn_rate] += count_new_babies
 
-        for timer in range(1, self.newborn_spawn_rate):
-            if timer in self.current_timers.keys():
-                self.current_timers[timer] = self.current_timers[timer] - 1
-            if self.spawn_rate in self.current_timers.keys():
-                self.current_timers[self.spawn_rate] += count_new_babies
-            else:
-                self.current_timers[self.spawn_rate] = count_new_babies
+        new_timers = {}
+        for timer in self.current_timers.keys():
+            if timer != 0:
+                new_timers[timer-1] = self.current_timers[timer]
+
+            if timer == 0:
+                count_new_babies = self.current_timers[0]
+                if count_new_babies > 0:
+                    new_timers[self.newborn_spawn_rate] = count_new_babies
+                    new_timers[self.spawn_rate] = count_new_babies
 
         self.school_size_by_day[day] = self.school_size_by_day[day-1] + count_new_babies
 
@@ -81,7 +80,7 @@ def simulate_faster(all_initial_timers: List, days_to_run: int = 256):
         days_past += 1
         school.update_timers(days_past)
 
-    return school.school_size_by_day[255]
+    return school.school_size_by_day[days_to_run]
 
 
 def simulate(all_initial_timers: List, days_to_run: int = 80):
