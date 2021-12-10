@@ -2,7 +2,7 @@
 
 # For each entry, determine all of the wire/segment connections and decode the four-digit output values.
 # What do you get if you add up all of the output values?
-from typing import List
+from typing import List, Dict
 
 
 class Digit:
@@ -52,7 +52,7 @@ class Decoder:
         self.decoder_dict = {}
         self.letter_dict = {}
         self.unsolved_letters = []
-        self.letter_translator = {}
+        self.letter_translator: Dict[str, str] = {}
 
     def add_digit_to_decoder_dict(self, digit, encoded_letters):
         self.decoder_dict[digit] = encoded_letters
@@ -106,6 +106,21 @@ def get_letter_frequency(letter_list):
     return letter_frequency
 
 
+def translate_output(output_list, letter_translator, correct_letter_dict):
+    coded_to_correct = {v: k for k, v in letter_translator.items()}
+
+    output_number = ''
+    for output in output_list:
+        translated_output = ''
+        for output_letter in output:
+            translated_output += coded_to_correct[output_letter]
+        for digit, digit_letter in correct_letter_dict.items():
+            if set(translated_output) == digit_letter:
+                output_number += digit
+
+    return int(output_number)
+
+
 if __name__ == '__main__':
 
     correct_letter_dict = {0: {'a', 'b', 'c', 'f', 'g'},
@@ -129,6 +144,8 @@ if __name__ == '__main__':
 
     correct_letter_freq = get_letter_frequency(correct_letter_dict.values())
 
+    output_numbers_sum = 0
+
     for puzzle in all_puzzles:
         signal_patterns = puzzle[0]
         encoded_output = puzzle[1]
@@ -138,11 +155,16 @@ if __name__ == '__main__':
         for signal_pattern in signal_patterns:
             for easy_digit in easy_digits:
 
+                if len(correct_letter_dict[easy_digit]) == len(signal_pattern):
+                    decoder.decoder_dict[easy_digit] = set(signal_pattern)
+
+        for signal_pattern in signal_patterns:
+            for easy_digit in easy_digits:
                 if len(signal_pattern) == Digit(easy_digit).letter_count_in_number:
                     decoder.add_digit_to_decoder_dict(easy_digit, signal_pattern)
                 # if you know that 1 is "cf" and 7 is "acf" => get that up_horizontal_line = ~a~ => deduce up_horizontal_line in 8
                 # you know ~a~ based on difference between 1 and 7
-                decoder.letter_translator["a"] = decoder.decoder_dict[7].difference(decoder.decoder_dict[1])
+                decoder.letter_translator["a"] = list(set(decoder.decoder_dict[7]).difference(set(decoder.decoder_dict[1]))).pop()
 
             for actual_letter in correct_letter_freq.items():
                 for encoded_letter in encoded_letter_freq.items():
@@ -153,13 +175,16 @@ if __name__ == '__main__':
                         # you know ~f~ is the only one with 9 mentions
                         if encoded_letter[1] == actual_letter[1]:
                             decoder.letter_translator[actual_letter[0]] = encoded_letter[0]
-                        elif (encoded_letter[1] == 8) and (encoded_letter[1] != 'a'):
-                            # knowing ~a~ you can deduce that ~c~ is the only other letter with 8
-                            decoder.letter_translator['c'] = encoded_letter[0]
+                    if (encoded_letter[1] == 8) and (encoded_letter[1] != 'a'):
+                        # knowing ~a~ you can deduce that ~c~ is the only other letter with 8
+                        decoder.letter_translator['c'] = encoded_letter[0]
+
+        for signal_pattern in signal_patterns:
 
             # knowing which letter is 4 and which letters are 'bcf' you can deduce what ~d~
-            bcf = set([decoder.letter_translator[bcf] for bcf in ['b', 'c', 'f']])
-            decoder.letter_translator['d'] = decoder.decoder_dict[4].difference(bcf)
+            bcf_set = set([decoder.letter_translator[bcf] for bcf in ['b', 'c', 'f']])
+
+            decoder.letter_translator['d'] = set(decoder.decoder_dict[4]).difference(bcf_set)
 
             # knowing ~d~ you know the remaining letter (with 7 freq) is ~g~
             for actual_letter in correct_letter_freq.items():
@@ -167,14 +192,15 @@ if __name__ == '__main__':
                     if (encoded_letter[1] == 7) and (encoded_letter[1] != 'd'):
                         decoder.letter_translator['g'] = encoded_letter[0]
 
-        print(decoder.decoder_dict)
+        # print(decoder.decoder_dict)
+        print(decoder.letter_translator)
         print(encoded_letter_freq)
 
+        # Answer to question 2
+        translated_output = translate_output(encoded_output, decoder.letter_translator, correct_letter_dict)
+        output_numbers_sum += translated_output
 
-
-
-
-    # answer_2 = simulate_faster(all_initial_timers, days_to_run=256)
+    answer_2 = output_numbers_sum
 
     print('Answer 1: ', answer_1)
-    # print('Answer 2: ', answer_2)
+    print('Answer 2: ', answer_2)
