@@ -95,6 +95,7 @@ def parse_file(input_file: str) -> List[List[List[str]]]:
 
 
 def get_letter_frequency(letter_list):
+
     letter_frequency = {}
     for letters in letter_list:
         for letter in letters:
@@ -116,14 +117,14 @@ def translate_output(output_list, letter_translator, correct_letter_dict):
             translated_output += coded_to_correct[output_letter]
         for digit, digit_letter in correct_letter_dict.items():
             if set(translated_output) == digit_letter:
-                output_number += digit
+                output_number += str(digit)
 
     return int(output_number)
 
 
 if __name__ == '__main__':
 
-    correct_letter_dict = {0: {'a', 'b', 'c', 'f', 'g'},
+    correct_letter_dict = {0: {'a', 'b', 'c', 'f', 'g', 'e'},
                            1: {'c', 'f'},
                            2: {'a', 'c', 'd', 'e', 'g'},
                            3: {'a', 'c', 'd', 'f', 'g'},
@@ -166,16 +167,18 @@ if __name__ == '__main__':
                 # you know ~a~ based on difference between 1 and 7
                 decoder.letter_translator["a"] = list(set(decoder.decoder_dict[7]).difference(set(decoder.decoder_dict[1]))).pop()
 
+            # TODO something is wrong with the encoded letter freq dictionary which is why
+            #  it doesn't find an element with freq 3 and e doesn't get added to the letter_translator
             for actual_letter in correct_letter_freq.items():
                 for encoded_letter in encoded_letter_freq.items():
-                    if encoded_letter[1] in [6, 3, 9]:
+                    if encoded_letter[1] in [6, 4, 9]:
                         # knowing {'c': 8, 'a': 8, 'b': 6, 'g': 7, 'f': 9, 'd': 7, 'e': 3},
                         # you know ~b~ is the only one with 6 mentions
                         # you know ~e~ is the only one with 3 mentions
                         # you know ~f~ is the only one with 9 mentions
                         if encoded_letter[1] == actual_letter[1]:
                             decoder.letter_translator[actual_letter[0]] = encoded_letter[0]
-                    if (encoded_letter[1] == 8) and (encoded_letter[1] != 'a'):
+                    if (encoded_letter[1] == 8) and (encoded_letter[1] != 'a') and encoded_letter[0] not in decoder.letter_translator.values():
                         # knowing ~a~ you can deduce that ~c~ is the only other letter with 8
                         decoder.letter_translator['c'] = encoded_letter[0]
 
@@ -184,7 +187,7 @@ if __name__ == '__main__':
             # knowing which letter is 4 and which letters are 'bcf' you can deduce what ~d~
             bcf_set = set([decoder.letter_translator[bcf] for bcf in ['b', 'c', 'f']])
 
-            decoder.letter_translator['d'] = set(decoder.decoder_dict[4]).difference(bcf_set)
+            decoder.letter_translator['d'] = list(set(decoder.decoder_dict[4]).difference(bcf_set)).pop()
 
             # knowing ~d~ you know the remaining letter (with 7 freq) is ~g~
             for actual_letter in correct_letter_freq.items():
