@@ -19,7 +19,6 @@ class Digit:
 
         self.digit = digit
         self.digit_name = self.digit_name_dict[digit]
-
         self.letters_in_digit = self.digit_letters_dict[self.digit]
         self.letter_count_in_number = len(self.letters_in_digit)
 
