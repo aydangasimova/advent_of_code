@@ -167,12 +167,10 @@ if __name__ == '__main__':
                 # you know ~a~ based on difference between 1 and 7
                 decoder.letter_translator["a"] = list(set(decoder.decoder_dict[7]).difference(set(decoder.decoder_dict[1]))).pop()
 
-            # TODO something is wrong with the encoded letter freq dictionary which is why
-            #  it doesn't find an element with freq 3 and e doesn't get added to the letter_translator
             for actual_letter in correct_letter_freq.items():
                 for encoded_letter in encoded_letter_freq.items():
                     if encoded_letter[1] in [6, 4, 9]:
-                        # knowing {'c': 8, 'a': 8, 'b': 6, 'g': 7, 'f': 9, 'd': 7, 'e': 3},
+                        # knowing {'c': 8, 'a': 8, 'b': 6, 'g': 7, 'f': 9, 'd': 7, 'e': 4},
                         # you know ~b~ is the only one with 6 mentions
                         # you know ~e~ is the only one with 3 mentions
                         # you know ~f~ is the only one with 9 mentions
@@ -186,14 +184,12 @@ if __name__ == '__main__':
 
             # knowing which letter is 4 and which letters are 'bcf' you can deduce what ~d~
             bcf_set = set([decoder.letter_translator[bcf] for bcf in ['b', 'c', 'f']])
-
+            # TODO d and g are both assigned the same letter now
             decoder.letter_translator['d'] = list(set(decoder.decoder_dict[4]).difference(bcf_set)).pop()
 
-            # knowing ~d~ you know the remaining letter (with 7 freq) is ~g~
-            for actual_letter in correct_letter_freq.items():
-                for encoded_letter in encoded_letter_freq.items():
-                    if (encoded_letter[1] == 7) and (encoded_letter[1] != 'd'):
-                        decoder.letter_translator['g'] = encoded_letter[0]
+        # knowing ~d~ you know the remaining letter (with 7 freq) is ~g~
+
+        decoder.letter_translator['g'] = list(set(correct_letter_freq.keys()).difference(set(decoder.letter_translator.values()))).pop()
 
         # print(decoder.decoder_dict)
         print(decoder.letter_translator)
