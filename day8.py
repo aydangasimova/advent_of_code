@@ -1,7 +1,3 @@
-# PART 1: In the output values, how many times do digits 1, 4, 7, or 8 appear?
-
-# For each entry, determine all of the wire/segment connections and decode the four-digit output values.
-# What do you get if you add up all of the output values?
 from typing import List, Dict
 
 
@@ -28,14 +24,6 @@ class Digit:
         self.letter_count_in_number = len(self.letters_in_digit)
 
 
-class Display:
-    def __init__(self, displayed_string: str):
-        self.displayed_string = displayed_string
-
-    def translator(self):
-        pass
-
-
 class Decoder:
     def __init__(self, puzzle):
         self.puzzle = puzzle
@@ -50,24 +38,10 @@ class Decoder:
                                     8: {'a', 'b', 'c', 'd', 'e', 'f', 'g'},
                                     9: {'a', 'b', 'c', 'd', 'f', 'g'}}
         self.decoder_dict = {}
-        self.letter_dict = {}
-        self.unsolved_letters = []
         self.letter_translator: Dict[str, str] = {}
 
     def add_digit_to_decoder_dict(self, digit, encoded_letters):
         self.decoder_dict[digit] = encoded_letters
-
-    def add_to_letter_dict(self, digit, encoded_letters):
-        for letter in encoded_letters:
-            pass
-        return 0
-
-    def get_letter_frequency(self):
-        for letter in puzzle[0]:
-            pass
-
-    def add_to_letter_translator(self, encoded_letter_string, actual_letter):
-        self.letter_tranlator[actual_letter] = encoded_letter_string
 
 
 def find_easy_encoded_digits(easy_digits, all_puzzles):
@@ -135,7 +109,7 @@ if __name__ == '__main__':
                            8: {'a', 'b', 'c', 'd', 'e', 'f', 'g'},
                            9: {'a', 'b', 'c', 'd', 'f', 'g'}}
 
-    all_puzzles = parse_file("test.csv")
+    all_puzzles = parse_file("input8.csv")
 
     all_digits = {d for d in range(0,10)}
     easy_digits = {1, 4, 7, 8}
@@ -181,19 +155,12 @@ if __name__ == '__main__':
                         decoder.letter_translator['c'] = encoded_letter[0]
 
         for signal_pattern in signal_patterns:
-
             # knowing which letter is 4 and which letters are 'bcf' you can deduce what ~d~
             bcf_set = set([decoder.letter_translator[bcf] for bcf in ['b', 'c', 'f']])
-            # TODO d and g are both assigned the same letter now
             decoder.letter_translator['d'] = list(set(decoder.decoder_dict[4]).difference(bcf_set)).pop()
 
-        # knowing ~d~ you know the remaining letter (with 7 freq) is ~g~
-
+        # knowing all the other letters, we can deduce which one is ~g~
         decoder.letter_translator['g'] = list(set(correct_letter_freq.keys()).difference(set(decoder.letter_translator.values()))).pop()
-
-        # print(decoder.decoder_dict)
-        print(decoder.letter_translator)
-        print(encoded_letter_freq)
 
         # Answer to question 2
         translated_output = translate_output(encoded_output, decoder.letter_translator, correct_letter_dict)
