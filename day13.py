@@ -15,7 +15,7 @@ def parse_file(input_file: str) -> Tuple[Set[Tuple[int]], Dict[int, Tuple[str, i
     folds = {}
 
     for i, fold_string in enumerate(fold_strings):
-        folds[i] = (fold_string[-3], int(fold_string[-1]))
+        folds[i] = (fold_string[11], int(fold_string[13:]))
 
     dots = set()
     for dot_string in dot_strings:
@@ -36,8 +36,11 @@ def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
                 dots_to_remove.add(dot)
                 distance_to_fold = dot[1]-fold[1]
                 dots_after_fold.add((dot[0], fold[1]-distance_to_fold))
-        else:
-            pass
+        elif fold[0] == 'x':
+            if dot[0] > fold[1]:
+                dots_to_remove.add(dot)
+                distance_to_fold = dot[0] - fold[1]
+                dots_after_fold.add((fold[1]-distance_to_fold, dot[1]))
 
     remaining_dots = dots_before_fold.difference(dots_to_remove)
 
@@ -45,13 +48,13 @@ def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
 
 
 if __name__ == '__main__':
-    dots, folds = parse_file("test.csv")
+    dots, folds = parse_file("input13.csv")
 
     dots_after_first_fold = complete_fold(dots, folds[0])
 
     answer_1 = len(dots_after_first_fold)
 
     # answer_2 = output_numbers_sum
-    #
+
     print('Answer 1: ', answer_1)
     # print('Answer 2: ', answer_2)
