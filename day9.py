@@ -41,30 +41,16 @@ def parse_file(input_file: str) -> List[Location]:
     for row_number, line in enumerate(all_lines):
         line = line.strip("")
         for position, number in enumerate(line):
-            print(f"looking at number {number} in position {position} and row number {row_number} line {line}")
-            if row_number == 0:
-                # There is no upper neighbour
-                up = None
-            else:
-                up = int(all_lines[row_number-1][position])
+            # print(f"looking at number {number} in position {position} and row {row_number} line {line}")
 
-            if row_number == len(all_lines):
-                #  There is no bottom neighbour
-                down = None
-            else:
-                down = int(all_lines[row_number + 1][position])
-
-            if position == 0:
-                # there is no left neighbour (it's an upper left corner)
-                left = None
-            else:
-                left = int(line[position - 1])
-
-            if position == len(line)-1:
-                # there is no right neighbour (it's an upper right corner)
-                right = None
-            else:
-                right = int(line[position+1])
+            #  There is no upper neighbour
+            up = None if row_number == 0 else int(all_lines[row_number-1][position])
+            #  There is no bottom neighbour
+            down = None if row_number == len(all_lines)-1 else int(all_lines[row_number + 1][position])
+            # There is no left neighbour (it's an upper left corner)
+            left = None if position == 0 else int(line[position - 1])
+            # There is no right neighbour (it's an upper right corner)
+            right = None if position == len(line)-1 else int(line[position+1])
 
             location = Location(number,
                                 up=up,
@@ -72,9 +58,8 @@ def parse_file(input_file: str) -> List[Location]:
                                 left=left,
                                 right=right)
 
-
             locations.append(location)
-            print(f"added a new location for {number} in line {line}")
+            # print(f"added a new location for {number} in line {line}")
 
     return locations
 
