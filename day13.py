@@ -1,31 +1,57 @@
-from typing import Tuple, Set, List
+from typing import Tuple, Set, List, Dict
 
 
 # How many dots are visible after completing just the first fold instruction on your transparent paper?
 
-def parse_file(input_file: str) -> Tuple[Set[Tuple[int]], List[str]]:
+def parse_file(input_file: str) -> Tuple[Set[Tuple[int]], Dict[int, Tuple[str, int]]]:
     input_str = ''
 
     for line in open(input_file, 'r'):
         line = line.strip("")
         input_str += line
 
-    dot_strings, folds = [input_line.split("\n") for input_line in input_str.split("\n\n")]
+    dot_strings, fold_strings = [input_line.split("\n") for input_line in input_str.split("\n\n")]
+
+    folds = {}
+
+    for i, fold_string in enumerate(fold_strings):
+        folds[i] = (fold_string[-3], int(fold_string[-1]))
 
     dots = set()
-
     for dot_string in dot_strings:
         dots.add(tuple(int(coordinate) for coordinate in dot_string.split(",")))
 
     return dots, folds
 
 
+def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
+    dots_after_fold = set()
+    dots_to_remove = set()
+
+    for dot in dots_before_fold:
+        if fold[0] == 'y':
+        # for all dots, if dot is beyond/down/higher than 'y',
+        # reverse them by reducing y value with fold line - distance of y to fold
+            if dot[1] > fold[1]:
+                dots_to_remove.add(dot)
+                distance_to_fold = dot[1]-fold[1]
+                dots_after_fold.add((dot[0], fold[1]-distance_to_fold))
+        else:
+            pass
+
+    remaining_dots = dots_before_fold.difference(dots_to_remove)
+
+    return dots_after_fold.union(remaining_dots)
+
+
 if __name__ == '__main__':
     dots, folds = parse_file("test.csv")
 
+    dots_after_first_fold = complete_fold(dots, folds[0])
 
-    # answer_1 = output_numbers_sum
+    answer_1 = len(dots_after_first_fold)
+
     # answer_2 = output_numbers_sum
     #
-    # print('Answer 1: ', answer_1)
+    print('Answer 1: ', answer_1)
     # print('Answer 2: ', answer_2)
