@@ -46,6 +46,11 @@ def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
 
     return dots_after_fold.union(remaining_dots)
 
+# Finish folding the transparent paper according to the instructions.
+# The manual says the code is always eight capital letters.
+# What code do you use to activate the infrared thermal imaging camera system?
+
+
 
 if __name__ == '__main__':
     dots, folds = parse_file("input13.csv")
@@ -53,6 +58,9 @@ if __name__ == '__main__':
     dots_after_first_fold = complete_fold(dots, folds[0])
 
     answer_1 = len(dots_after_first_fold)
+
+    for fold in folds:
+        complete_fold(dots, folds[0])
 
     # answer_2 = output_numbers_sum
 
