@@ -24,9 +24,11 @@ class Location:
         self.down = down
         self.left = left
         self.right = right
+        self.adjacent_list = [self.up, self.down, self.right, self.left]
 
     def is_low_point(self) -> bool:
-        if self.height <= min([self.up, self.down, self.right, self.left]):
+        no_null_adjacent_list = list(filter(lambda nb: (nb is not None), self.adjacent_list))
+        if self.height < min(no_null_adjacent_list):
             return True
 
     def get_risk_level(self) -> int:
@@ -52,7 +54,7 @@ def parse_file(input_file: str) -> List[Location]:
             # There is no right neighbour (it's an upper right corner)
             right = None if position == len(line)-1 else int(line[position+1])
 
-            location = Location(number,
+            location = Location(int(number),
                                 up=up,
                                 down=down,
                                 left=left,
@@ -66,15 +68,19 @@ def parse_file(input_file: str) -> List[Location]:
 
 if __name__ == '__main__':
 
-    locations = parse_file("test9.csv")
+    locations = parse_file("input9.csv")
 
-    # dots, folds = parse_file("input13.csv")
+    low_points = []
+    risk_level_sum = 0
 
-    # dots_after_first_fold = complete_fold(dots, folds[0])
+    for location in locations:
+        if location.is_low_point():
+            low_points.append(location)
+            risk_level_sum += location.get_risk_level()
 
-    # answer_1 = len(dots_after_first_fold)
+    answer_1 = risk_level_sum
 
     # answer_2 = output_numbers_sum
 
-    # print('Answer 1: ', answer_1)
+    print('Answer 1: ', answer_1)
     # print('Answer 2: ', answer_2)
