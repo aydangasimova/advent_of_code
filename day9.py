@@ -11,7 +11,6 @@ class Location:
             down: Union[int, None],
             left: Union[int, None],
             right: Union[int, None]):
-
         self.height = height
         self.row_index = row_index
         self.line_index = line_index
@@ -54,7 +53,6 @@ class BasinLocation(Location):
     def add_to_basin(self, new_basin_location: Location):
         self.basin_locations.append(new_basin_location)
 
-
     def update_basin_edges(self):
         new_edges = []
         for edge in self.basin_edges:
@@ -62,12 +60,12 @@ class BasinLocation(Location):
             if all(potential_edge < edge.height for potential_edge in no_null_adjacent_list):
                 self.basin_complete = True
             else:
-                for potential_edge in filter(lambda potential_edge: ((potential_edge>edge.height) and (potential_edge!=9)), no_null_adjacent_list):
+                for potential_edge in filter(
+                        lambda potential_edge: ((potential_edge > edge.height) and (potential_edge != 9)),
+                        no_null_adjacent_list):
                     # new_edge = Location(potential_edge, )
                     # new_edges.append(new_edge)
                     pass
-
-
 
 
 #     if there is no more need to update basin edges
@@ -84,13 +82,13 @@ def parse_file(input_file: str) -> List[Location]:
             # print(f"looking at number {number} in position {position} and row {row_number} line {line}")
 
             #  There is no upper neighbour
-            up = None if row_number == 0 else int(all_lines[row_number-1][position])
+            up = None if row_number == 0 else int(all_lines[row_number - 1][position])
             #  There is no bottom neighbour
-            down = None if row_number == len(all_lines)-1 else int(all_lines[row_number + 1][position])
+            down = None if row_number == len(all_lines) - 1 else int(all_lines[row_number + 1][position])
             # There is no left neighbour (it's an upper left corner)
             left = None if position == 0 else int(line[position - 1])
             # There is no right neighbour (it's an upper right corner)
-            right = None if position == len(line)-1 else int(line[position+1])
+            right = None if position == len(line) - 1 else int(line[position + 1])
 
             location = Location(int(number),
                                 row_index=row_number,
@@ -129,7 +127,6 @@ if __name__ == '__main__':
             risk_level_sum += location.get_risk_level()
 
     answer_1 = risk_level_sum
-
 
     # answer_2 = output_numbers_sum
 
