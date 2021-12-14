@@ -51,7 +51,6 @@ def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
 # What code do you use to activate the infrared thermal imaging camera system?
 
 
-
 if __name__ == '__main__':
     dots, folds = parse_file("input13.csv")
 
