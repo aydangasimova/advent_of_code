@@ -1,7 +1,6 @@
-from typing import Tuple, Set, List, Dict
+from typing import Tuple, Set, List, Dict, Callable
+import functools
 
-
-# How many dots are visible after completing just the first fold instruction on your transparent paper?
 
 def parse_file(input_file: str) -> Tuple[Set[Tuple[int]], Dict[int, Tuple[str, int]]]:
     input_str = ''
@@ -30,32 +29,59 @@ def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
 
     for dot in dots_before_fold:
         if fold[0] == 'y':
-        # for all dots, if dot is beyond/down/higher than 'y',
-        # reverse them by reducing y value with fold line - distance of y to fold
+            # for all dots, if dot is beyond/down/higher than 'y',
+            # reverse them by reducing y value with fold line - distance of y to fold
             if dot[1] > fold[1]:
                 dots_to_remove.add(dot)
-                distance_to_fold = dot[1]-fold[1]
-                dots_after_fold.add((dot[0], fold[1]-distance_to_fold))
+                distance_to_fold = dot[1] - fold[1]
+                dots_after_fold.add((dot[0], fold[1] - distance_to_fold))
         elif fold[0] == 'x':
             if dot[0] > fold[1]:
                 dots_to_remove.add(dot)
                 distance_to_fold = dot[0] - fold[1]
-                dots_after_fold.add((fold[1]-distance_to_fold, dot[1]))
+                dots_after_fold.add((fold[1] - distance_to_fold, dot[1]))
 
     remaining_dots = dots_before_fold.difference(dots_to_remove)
 
     return dots_after_fold.union(remaining_dots)
 
 
-def visualize_dots(dots_to_visualize, x_limit, y_limit):
+# Transformation = Callable[[Set], Set]
 
+
+# def complete_all_folds(func, initial_dots, folds):
+#
+#     @functools.wraps(func)
+#     def wrapper(*args, **kwargs):
+#         for fold in folds:
+#             func(*args, **kwargs)
+#         return wrapper(*args, **kwargs)
+#     return
+
+#
+# def transform(dots: Set, *transformations: Transformation) -> Set:
+#     """
+#     Performs all transformations on the input dataframe and returns the final result
+#
+#     Input:
+#     - df:              A Spark DataFrame
+#     - transformations: One or more transformation functions that accept a Spark
+#             DataFrame as input and have a Spark DataFrame as output
+#     """
+#     for transformation in transformations:
+#         df = transformation(df)
+#     return df
+
+# Finish folding the transparent paper according to the instructions.
+# The manual says the code is always eight capital letters.
+# What code do you use to activate the infrared thermal imaging camera system?
+
+
+def visualize_dots(dots_to_visualize, x_limit, y_limit):
     total_space = []
 
     for y in range(y_limit):
-        total_space.append(["."]*(x_limit+1))
-
-    for dot in dots_to_visualize:
-        pass
+        total_space.append(["."] * (x_limit + 1))
 
     for line in total_space:
         print(line)
@@ -67,6 +93,7 @@ def visualize_dots(dots_to_visualize, x_limit, y_limit):
             else:
                 print(line[index], end=" ")
         print(" ")
+
 
 # Finish folding the transparent paper according to the instructions.
 # The manual says the code is always eight capital letters.
@@ -103,22 +130,47 @@ def visualize_dots(dots_to_visualize, x_limit, y_limit):
 
 
 if __name__ == '__main__':
-    dots, folds = parse_file("test.csv")
+    dots, folds = parse_file("input13.csv")
 
     dots_after_first_fold = complete_fold(dots, folds[0])
 
     answer_1 = len(dots_after_first_fold)
 
-    # for i, fold in enumerate(folds):
-    #     complete_fold(complete_fold(folds[i+1]), folds[i])
     x_limit = max([dot[0] for dot in dots])
     y_limit = folds[0][1]
 
     visualize_dots(dots_after_first_fold, x_limit, y_limit)
 
-    # answer_2 = output_numbers_sum
-    #
+    fold_dot_outcome = {}
 
+    for fold_id, fold in folds.items():
+        if fold_id == 0:
+            fold_dot_outcome[fold_id] = complete_fold(dots, fold)
+        else:
+            fold_dot_outcome[fold_id] = complete_fold(fold_dot_outcome[fold_id - 1], fold)
+
+    final_dots = fold_dot_outcome[list(folds.keys())[-1]]
+
+    y_limit_found = False
+    x_limit_found = False
+    for i in range(1, len(folds.keys())):
+        if folds[len(folds.keys()) - i][0] == "y":
+            if not y_limit_found:
+                y_limit = folds[len(folds.keys()) - i][1]
+                y_limit_found = True
+                break
+        elif folds[len(folds.keys()) - i][0] == "x":
+            if not x_limit_found:
+                x_limit = folds[len(folds.keys()) - i][1]
+                x_limit_found = True
+                break
+
+    print(f"x lim is {x_limit}")
+    print(f"y lim is {y_limit}")
+
+    visualize_dots(final_dots, x_limit, y_limit)
+
+    answer_2 = "EFJKZLBL"
 
     print('Answer 1: ', answer_1)
-    # print('Answer 2: ', answer_2)
+    print('Answer 2: ', answer_2)
