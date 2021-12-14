@@ -1,5 +1,4 @@
-from typing import Tuple, Set, List, Dict, Callable
-import functools
+from typing import Tuple, Set, Dict
 
 
 def parse_file(input_file: str) -> Tuple[Set[Tuple[int]], Dict[int, Tuple[str, int]]]:
@@ -46,37 +45,6 @@ def complete_fold(dots_before_fold: Set, fold: Tuple[str, int]) -> Set:
     return dots_after_fold.union(remaining_dots)
 
 
-# Transformation = Callable[[Set], Set]
-
-
-# def complete_all_folds(func, initial_dots, folds):
-#
-#     @functools.wraps(func)
-#     def wrapper(*args, **kwargs):
-#         for fold in folds:
-#             func(*args, **kwargs)
-#         return wrapper(*args, **kwargs)
-#     return
-
-#
-# def transform(dots: Set, *transformations: Transformation) -> Set:
-#     """
-#     Performs all transformations on the input dataframe and returns the final result
-#
-#     Input:
-#     - df:              A Spark DataFrame
-#     - transformations: One or more transformation functions that accept a Spark
-#             DataFrame as input and have a Spark DataFrame as output
-#     """
-#     for transformation in transformations:
-#         df = transformation(df)
-#     return df
-
-# Finish folding the transparent paper according to the instructions.
-# The manual says the code is always eight capital letters.
-# What code do you use to activate the infrared thermal imaging camera system?
-
-
 def visualize_dots(dots_to_visualize, x_limit, y_limit):
     total_space = []
 
@@ -93,40 +61,6 @@ def visualize_dots(dots_to_visualize, x_limit, y_limit):
             else:
                 print(line[index], end=" ")
         print(" ")
-
-
-# Finish folding the transparent paper according to the instructions.
-# The manual says the code is always eight capital letters.
-# What code do you use to activate the infrared thermal imaging camera system?
-
-# Transformation = Callable[[DataFrame], DataFrame]
-
-# def transform(df: DataFrame, *transformations: Transformation) -> DataFrame:
-#     """
-#     Performs all transformations on the input dataframe and returns the final result
-#
-#     Input:
-#     - df:              A Spark DataFrame
-#     - transformations: One or more transformation functions that accept a Spark
-#             DataFrame as input and have a Spark DataFrame as output
-#     """
-#     for transformation in transformations:
-#         df = transformation(df)
-#     return df
-
-# def transform_tables(airing: DataFrame, viewership: DataFrame, chunks: DataFrame) -> DataFrame:
-#     return transform(
-#         airing,
-#         join_with_viewership(viewership=viewership),
-#         join_with_chunks(chunks=chunks),
-#     )
-
-# def transform_tables(airing: DataFrame, viewership: DataFrame, chunks: DataFrame) -> DataFrame:
-#     return transform(
-#         airing,
-#         join_with_viewership(viewership=viewership),
-#         join_with_chunks(chunks=chunks),
-#     )
 
 
 if __name__ == '__main__':
